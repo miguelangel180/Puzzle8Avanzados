@@ -10,14 +10,17 @@ La opcion -D define lo siguiente como parte de la compilcion
   */
 
 #define SIZE_PUZZLE 9
+#define TRUE 1
+#define FALSE 0 
 
 
 /* el puzzle sera representado por una lista de enteros donde el largo de esta
 es de 9 elementos siempre:
 
-puzzle = [1,2,3,4,5,6,7,8,X]  =   1  2  3
-                                  4  5  6
-                                  7  8  X
+puzzle = [1,2,3,4,5,6,7,8,X]  =   1  2  3 , matriz de posicion = 0 1 2
+                                  4  5  6                        3 4 5
+                                  7  8  X                        6 7 8
+
 Para obtener un elemento de este puzzle es necesario una coordenada (X,Y)
 ya que :
 
@@ -38,13 +41,20 @@ typedef struct {
   int movimientos;
 }puzzle8;
 
-//lectura de archivo
+/*lectura de archivo, el archivo debe tener un formato de puzzle de la siguiente manera:
+
+				  1  2  3
+                                  4  5  6
+                                  7  8  X
+
+*/
+
 puzzle8* readFile(char* rute){
   char* puzzleList = (char*)malloc(sizeof(char)*SIZE_PUZZLE);
   FILE* fichero = fopen(rute,"r");
 
 
-#ifdef DEBUG //Sentencia de DEBUG
+  #ifdef DEBUG //Sentencia de DEBUG
   if (fichero) {
     printf("Fichero abierto correctamente\n");
   }
@@ -52,7 +62,7 @@ puzzle8* readFile(char* rute){
    {
     printf("No se pudo abrir el archivo\n");
   }
-#endif
+  #endif
 
   int i = 0;
   while (!feof(fichero)){
@@ -75,11 +85,137 @@ puzzle8* readFile(char* rute){
 
 }
 
+//funcion para obtener la posicion de X
+
+int currentPositionX(puzzle8* P){
+
+  for(int i =0; i<SIZE_PUZZLE;i++){
+    if(P->puzzle[i] == 'X'){
+	return i;
+    } 
+  }
+  return -1;
+}
+
+
+
+
+/* ################## Funciones de Comprobacion ################## */
+
+
+/* ¿X se puede mover hacia arriba? se podra mover si no esta en
+ las posiciones [0,1,2] o si:
+
+   sea i = posicion de 'X' en el arreglo
+   Si i-3 >= 0
+*/
+
+int canXUp(puzzle8* puzzle){
+  
+  int currentX = currentPositionX(puzzle);
+  if((currentX -3) >= 0){
+    return TRUE;
+  }
+  else{
+
+    return FALSE;
+  }
+
+}
+
+/* ¿X se puede mover hacia abajo? se podra mover si no esta en
+ las posiciones [6,7,8] o si:
+
+   sea i = posicion de 'X' en el arreglo
+   Si i+3 <= 8
+*/
+
+
+int canXDown(puzzle8* puzzle){
+  
+  int currentX = currentPositionX(puzzle);
+  if((currentX + 3) <= 8){
+    return TRUE;
+  }
+  else{
+
+    return FALSE;
+  }
+
+}
+
+
+/* ¿X se puede mover hacia la derecha? se podra mover si no esta en
+ las posiciones [2,5,8] o si:
+
+   sea i = posicion de 'X' en el arreglo
+   Si (i+1) % 3 != 0 
+*/
+
+
+int canXrigth(puzzle8* puzzle){
+  
+  int currentX = currentPositionX(puzzle);
+  if(((currentX + 1) % 3) != 0){
+    return TRUE;
+  }
+  else{
+
+    return FALSE;
+  }
+
+}
+
+/* ¿X se puede mover hacia la izquierda? se podra mover si no esta en
+ las posiciones [0,3,6] o si:
+
+   sea i = posicion de 'X' en el arreglo
+   Si i % 3 != 0 
+*/
+
+int canXleft(puzzle8* puzzle){
+  
+  int currentX = currentPositionX(puzzle);
+  if((currentX % 3) != 0){
+    return TRUE;
+  }
+  else{
+
+    return FALSE;
+  }
+
+}
+
+
+
+
+
+
 int main(int argc, char const *argv[]) {
+
+  #ifdef DEBUG //Sentencia de DEBUG
   puzzle8* a = readFile("puzzle.txt");
-  printf("nuevo**********************\n");
+  printf("**********************\n");
   for (int i = 0; i < SIZE_PUZZLE; i++) {
     printf(" posicion %i , caracter: %c\n",i,a->puzzle[i]);
   }
+  if(canXUp(a) == TRUE){
+
+    printf("se puede mover hacia arriba\n");
+  }
+  if(canXDown(a) == TRUE){
+
+    printf("se puede mover hacia abajo\n");
+  }
+  if(canXleft(a) == TRUE){
+
+    printf("se puede mover hacia la izquierda\n");
+  }
+  if(canXrigth(a) == TRUE){
+
+    printf("se puede mover hacia la derecha\n");
+  }
+  free(a);
+  #endif
   return 0;
 }
