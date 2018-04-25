@@ -1,10 +1,13 @@
- el puzzle sera representado por una lista de enteros donde el largo de esta
+El puzzle sera representado por una lista de enteros donde el largo de esta
 es de 9 elementos siempre:
 
 
   puzzle = [1,2,3,4,5,6,7,8,X]  =   1  2  3
                                     4  5  6
                                     7  8  X
+   //matriz
+
+
 Para obtener un elemento de este puzzle es necesario una coordenada (X,Y)
 ya que :
 
