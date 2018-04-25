@@ -41,6 +41,16 @@ typedef struct {
   int movimientos;
 }puzzle8;
 
+
+typedef struct nodo{
+  puzzle8* pzl;
+  int count;
+  struct nodo* next;
+}cola;
+
+
+char result[9]={'1','2','3','4','5','6','7','8','X');
+
 /*lectura de archivo, el archivo debe tener un formato de puzzle de la siguiente manera:
 
 				  1  2  3
@@ -187,6 +197,27 @@ int canXleft(puzzle8* puzzle){
 }
 
 
+
+/* ################## Funciones de inserccion ################## */
+
+void queue(cola* currentC, puzzle8* currentP){
+
+  if( currentC == NULL ){
+    currentC = (cola*)malloc(sizeof(cola));
+    currentC->pzl = currentP;
+    currentC->count = 0;
+    currentC->next = NULL;
+  }
+  else{
+    
+    cola* new =
+    cola* aux = currentC;
+    while(aux->next != NULL){
+    aux = aux->next;
+    }
+    aux->next=new;
+ }
+}
 
 
 
