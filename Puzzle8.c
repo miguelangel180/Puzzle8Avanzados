@@ -11,7 +11,7 @@ La opcion -D define lo siguiente como parte de la compilcion
 
 #define SIZE_PUZZLE 9
 #define TRUE 1
-#define FALSE 0 
+#define FALSE 0
 
 
 /* el puzzle sera representado por una lista de enteros donde el largo de esta
@@ -36,20 +36,20 @@ ya que :
 */
 
 // esta estructura representa un estado i del puzzle
-typedef struct {
+typedef struct nodo {
   char* puzzle;
   int movimientos;
+  struct nodo* next;
 }puzzle8;
 
 
-typedef struct nodo{
-  puzzle8* pzl;
+typedef struct {
+  puzzle8* first;
   int count;
-  struct nodo* next;
 }cola;
 
 
-char result[9]={'1','2','3','4','5','6','7','8','X');
+char result[9]={'1','2','3','4','5','6','7','8','X'};
 
 /*lectura de archivo, el archivo debe tener un formato de puzzle de la siguiente manera:
 
@@ -91,6 +91,7 @@ puzzle8* readFile(char* rute){
   puzzle8* tablero = (puzzle8*)malloc(sizeof(puzzle8));
   tablero->puzzle = puzzleList;
   tablero->movimientos = 0;
+  tablero->next =NULL;
   return tablero;
 
 }
@@ -102,7 +103,7 @@ int currentPositionX(puzzle8* P){
   for(int i =0; i<SIZE_PUZZLE;i++){
     if(P->puzzle[i] == 'X'){
 	return i;
-    } 
+    }
   }
   return -1;
 }
@@ -121,7 +122,7 @@ int currentPositionX(puzzle8* P){
 */
 
 int canXUp(puzzle8* puzzle){
-  
+
   int currentX = currentPositionX(puzzle);
   if((currentX -3) >= 0){
     return TRUE;
@@ -142,7 +143,7 @@ int canXUp(puzzle8* puzzle){
 
 
 int canXDown(puzzle8* puzzle){
-  
+
   int currentX = currentPositionX(puzzle);
   if((currentX + 3) <= 8){
     return TRUE;
@@ -159,12 +160,12 @@ int canXDown(puzzle8* puzzle){
  las posiciones [2,5,8] o si:
 
    sea i = posicion de 'X' en el arreglo
-   Si (i+1) % 3 != 0 
+   Si (i+1) % 3 != 0
 */
 
 
 int canXrigth(puzzle8* puzzle){
-  
+
   int currentX = currentPositionX(puzzle);
   if(((currentX + 1) % 3) != 0){
     return TRUE;
@@ -180,11 +181,11 @@ int canXrigth(puzzle8* puzzle){
  las posiciones [0,3,6] o si:
 
    sea i = posicion de 'X' en el arreglo
-   Si i % 3 != 0 
+   Si i % 3 != 0
 */
 
 int canXleft(puzzle8* puzzle){
-  
+
   int currentX = currentPositionX(puzzle);
   if((currentX % 3) != 0){
     return TRUE;
@@ -200,36 +201,87 @@ int canXleft(puzzle8* puzzle){
 
 /* ################## Funciones de inserccion ################## */
 
-void queue(cola* currentC, puzzle8* currentP){
 
-  if( currentC == NULL ){
-    currentC = (cola*)malloc(sizeof(cola));
-    currentC->pzl = currentP;
-    currentC->count = 0;
-    currentC->next = NULL;
+void encolar(cola* currentC, puzzle8* new){
+
+  if (currentC->first == NULL) {
+    currentC->first = new;
+    currentC->count = 1;
+
+    #ifdef DEBUG
+
+     printf("***La cola no tiene elementos = Cola vacia***\n");
+
+    #endif
+
   }
   else{
-    
-    cola* new =
-    cola* aux = currentC;
-    while(aux->next != NULL){
-    aux = aux->next;
+
+    #ifdef DEBUG
+
+     printf("***La cola tiene elementos = Cola NO vacia***\n");
+
+    #endif
+    puzzle8* aux = currentC->first;
+
+    while (aux->next != NULL) {
+      aux = aux->next;
     }
-    aux->next=new;
- }
+    aux->next = new;
+    currentC->count++;
+
+  }
+
 }
+puzzle8* desencolar(cola* currentC){
+
+  if (currentC->first == NULL) {
+
+    #ifdef DEBUG
+    printf("No hay nada que desencolar\n");
+    #endif
+    return NULL;
+  }
+  else{
+
+    #ifdef DEBUG
+    printf("hay elementos que desencolar\n");
+    #endif
+    puzzle8* aux = currentC->first;
+    currentC->first=currentC->first->next;
+    aux->next=NULL;
+    currentC->count--;
+    return aux;
+  }
 
 
 
+}
 
 int main(int argc, char const *argv[]) {
 
   #ifdef DEBUG //Sentencia de DEBUG
+
   puzzle8* a = readFile("puzzle.txt");
+  cola* currentCola = (cola*)malloc(sizeof(cola));
+  puzzle8* c = desencolar(currentCola);
+  currentCola->first=NULL;
+  currentCola->count=0;
+  encolar(currentCola,a);
+  printf("cantidad de elementos en la cola = %i\n",currentCola->count);
   printf("**********************\n");
+
+  puzzle8* b = desencolar(currentCola);
+  printf("cantidad de elementos en la cola = %i\n",currentCola->count);
   for (int i = 0; i < SIZE_PUZZLE; i++) {
-    printf(" posicion %i , caracter: %c\n",i,a->puzzle[i]);
+    printf(" posicion %i , caracter: %c\n",i,b->puzzle[i]);
   }
+
+  encolar(currentCola,a);
+  printf("cantidad de elementos en la cola = %i\n",currentCola->count);
+  encolar(currentCola,b);
+  printf("cantidad de elementos en la cola = %i\n",currentCola->count);
+
   if(canXUp(a) == TRUE){
 
     printf("se puede mover hacia arriba\n");
@@ -246,7 +298,12 @@ int main(int argc, char const *argv[]) {
 
     printf("se puede mover hacia la derecha\n");
   }
-  free(a);
+
+  while(currentCola->first != NULL){
+    free(desencolar(currentCola));
+  }
+  free(currentCola);
+
   #endif
   return 0;
 }
