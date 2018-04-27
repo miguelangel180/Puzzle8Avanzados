@@ -12,7 +12,7 @@ La opcion -D define lo siguiente como parte de la compilcion
 #define SIZE_PUZZLE 9
 #define TRUE 1
 #define FALSE 0
-
+#define RESULT ['1','2','3','4','5','6','7','8','X']
 
 /* el puzzle sera representado por una lista de enteros donde el largo de esta
 es de 9 elementos siempre:
@@ -134,6 +134,16 @@ int canXUp(puzzle8* puzzle){
 
 }
 
+void moveXUp(puzzle8* puzzle){
+  int currentX = currentPositionX(puzzle);
+  char aux = puzzle->puzzle[currentX-3];
+  puzzle->puzzle[currentX] = aux;
+  puzzle->puzzle[currentX-3] = 'X';
+
+}
+
+
+
 /* ¿X se puede mover hacia abajo? se podra mover si no esta en
  las posiciones [6,7,8] o si:
 
@@ -156,6 +166,14 @@ int canXDown(puzzle8* puzzle){
 }
 
 
+void moveXdown(puzzle8* puzzle){
+  int currentX = currentPositionX(puzzle);
+  char aux = puzzle->puzzle[currentX+3];
+  puzzle->puzzle[currentX] = aux;
+  puzzle->puzzle[currentX+3] = 'X';
+
+}
+
 /* ¿X se puede mover hacia la derecha? se podra mover si no esta en
  las posiciones [2,5,8] o si:
 
@@ -174,6 +192,14 @@ int canXrigth(puzzle8* puzzle){
 
     return FALSE;
   }
+
+}
+
+void moveXrigth(puzzle8* puzzle){
+  int currentX = currentPositionX(puzzle);
+  char aux = puzzle->puzzle[currentX+1];
+  puzzle->puzzle[currentX] = aux;
+  puzzle->puzzle[currentX+1] = 'X';
 
 }
 
@@ -197,11 +223,17 @@ int canXleft(puzzle8* puzzle){
 
 }
 
+void moveXleft(puzzle8* puzzle){
+  int currentX = currentPositionX(puzzle);
+  char aux = puzzle->puzzle[currentX-1];
+  puzzle->puzzle[currentX] = aux;
+  puzzle->puzzle[currentX-1] = 'X';
 
+}
 
-/* ################## Funciones de inserccion ################## */
+/* ################## Funciones de colas ################## */
 
-
+//queue
 void encolar(cola* currentC, puzzle8* new){
 
   if (currentC->first == NULL) {
@@ -233,6 +265,8 @@ void encolar(cola* currentC, puzzle8* new){
   }
 
 }
+
+//dequeue
 puzzle8* desencolar(cola* currentC){
 
   if (currentC->first == NULL) {
@@ -253,56 +287,98 @@ puzzle8* desencolar(cola* currentC){
     currentC->count--;
     return aux;
   }
-
-
-
 }
 
+/* Funcion booleana que detecta si una estructura puzzle8 contiene el mismo
+arreglo que otra estructura */
+
+int equalsPuzzle(puzzle8* pzl, puzzle8* pzl2){
+
+  for (int i = 0; i < SIZE_PUZZLE; i++) {
+    if (pzl->puzzle[i] != pzl2->puzzle[i]) {
+      return FALSE;
+    }
+  }
+  return TRUE;
+}
+
+/* funcion booleana que detecta si dentro de toda la cola existe un puzzle
+igual a otro */
+
+int puzzleInCola(cola* currentC, puzzle8* pzl){
+
+  puzzle8* aux = currentC->first;
+
+  while(aux != NULL){
+
+    if (equalsPuzzle(aux, pzl) == TRUE) {
+       return TRUE;
+    }
+    aux = aux->next;
+  }
+  return FALSE;
+}
+
+
+
+void imprimir(puzzle8* pzl){
+  int y = 0;
+  for (int i = 0; i < SIZE_PUZZLE; i++) {
+    if (y == 3) {
+      printf("\n" );
+      y=0;
+    }
+    printf("%c ",pzl->puzzle[i]);
+    y++;
+  }
+  printf("\n");
+
+}
 int main(int argc, char const *argv[]) {
 
   #ifdef DEBUG //Sentencia de DEBUG
 
   puzzle8* a = readFile("puzzle.txt");
-  cola* currentCola = (cola*)malloc(sizeof(cola));
-  puzzle8* c = desencolar(currentCola);
-  currentCola->first=NULL;
-  currentCola->count=0;
-  encolar(currentCola,a);
-  printf("cantidad de elementos en la cola = %i\n",currentCola->count);
+  cola* visitados = (cola*)malloc(sizeof(cola));
+  visitados->first = NULL;
+  visitados->count = 0;
+  encolar(visitados,a);
   printf("**********************\n");
+  int x = 0;
+  while (x <= 5) {
 
-  puzzle8* b = desencolar(currentCola);
-  printf("cantidad de elementos en la cola = %i\n",currentCola->count);
-  for (int i = 0; i < SIZE_PUZZLE; i++) {
-    printf(" posicion %i , caracter: %c\n",i,b->puzzle[i]);
-  }
 
-  encolar(currentCola,a);
-  printf("cantidad de elementos en la cola = %i\n",currentCola->count);
-  encolar(currentCola,b);
-  printf("cantidad de elementos en la cola = %i\n",currentCola->count);
+  imprimir(a);
 
+  printf("comenzando a mover...\n" );
   if(canXUp(a) == TRUE){
-
-    printf("se puede mover hacia arriba\n");
+    moveXUp(a);
+    imprimir(a);
   }
   if(canXDown(a) == TRUE){
 
     printf("se puede mover hacia abajo\n");
+
+    moveXdown(a);
+    imprimir(a);
   }
   if(canXleft(a) == TRUE){
 
     printf("se puede mover hacia la izquierda\n");
+    moveXleft(a);
+    imprimir(a);
   }
   if(canXrigth(a) == TRUE){
 
     printf("se puede mover hacia la derecha\n");
+    moveXrigth(a);
+    imprimir(a);
   }
 
-  while(currentCola->first != NULL){
-    free(desencolar(currentCola));
-  }
-  free(currentCola);
+  x++;
+
+}
+free(a);
 
   #endif
   return 0;
