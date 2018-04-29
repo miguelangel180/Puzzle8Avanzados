@@ -12,7 +12,6 @@ La opcion -D define lo siguiente como parte de la compilcion
 #define SIZE_PUZZLE 9
 #define TRUE 1
 #define FALSE 0
-#define RESULT ['1','2','3','4','5','6','7','8','X']
 
 /* el puzzle sera representado por una lista de enteros donde el largo de esta
 es de 9 elementos siempre:
@@ -49,7 +48,19 @@ typedef struct {
 }cola;
 
 
-char result[9]={'1','2','3','4','5','6','7','8','X'};
+typedef struct enlace {
+  char* puzzle;
+  struct enlace* next;
+}list;
+
+typedef struct {
+  int count;
+  list* first;
+}listPuzzle;
+
+
+
+
 
 /*lectura de archivo, el archivo debe tener un formato de puzzle de la siguiente manera:
 
@@ -139,6 +150,8 @@ void moveXUp(puzzle8* puzzle){
   char aux = puzzle->puzzle[currentX-3];
   puzzle->puzzle[currentX] = aux;
   puzzle->puzzle[currentX-3] = 'X';
+  puzzle->movimientos++;
+
 
 }
 
@@ -171,6 +184,7 @@ void moveXdown(puzzle8* puzzle){
   char aux = puzzle->puzzle[currentX+3];
   puzzle->puzzle[currentX] = aux;
   puzzle->puzzle[currentX+3] = 'X';
+  puzzle->movimientos++;
 
 }
 
@@ -200,6 +214,7 @@ void moveXrigth(puzzle8* puzzle){
   char aux = puzzle->puzzle[currentX+1];
   puzzle->puzzle[currentX] = aux;
   puzzle->puzzle[currentX+1] = 'X';
+  puzzle->movimientos++;
 
 }
 
@@ -228,6 +243,7 @@ void moveXleft(puzzle8* puzzle){
   char aux = puzzle->puzzle[currentX-1];
   puzzle->puzzle[currentX] = aux;
   puzzle->puzzle[currentX-1] = 'X';
+  puzzle->movimientos++;
 
 }
 
@@ -251,7 +267,7 @@ void encolar(cola* currentC, puzzle8* new){
 
     #ifdef DEBUG
 
-     printf("***La cola tiene elementos = Cola NO vacia***\n");
+     //printf("***La cola tiene elementos = Cola NO vacia***\n");
 
     #endif
     puzzle8* aux = currentC->first;
@@ -292,10 +308,10 @@ puzzle8* desencolar(cola* currentC){
 /* Funcion booleana que detecta si una estructura puzzle8 contiene el mismo
 arreglo que otra estructura */
 
-int equalsPuzzle(puzzle8* pzl, puzzle8* pzl2){
+int equalsPuzzle(char* pzl, char* pzl2){
 
   for (int i = 0; i < SIZE_PUZZLE; i++) {
-    if (pzl->puzzle[i] != pzl2->puzzle[i]) {
+    if (pzl[i] != pzl2[i]) {
       return FALSE;
     }
   }
@@ -305,13 +321,13 @@ int equalsPuzzle(puzzle8* pzl, puzzle8* pzl2){
 /* funcion booleana que detecta si dentro de toda la cola existe un puzzle
 igual a otro */
 
-int puzzleInCola(cola* currentC, puzzle8* pzl){
+int wasVisited(listPuzzle* currentLP, char* pzl){
 
-  puzzle8* aux = currentC->first;
+  list* aux = currentLP->first;
 
   while(aux != NULL){
 
-    if (equalsPuzzle(aux, pzl) == TRUE) {
+    if (equalsPuzzle(aux->puzzle, pzl) == TRUE) {
        return TRUE;
     }
     aux = aux->next;
@@ -319,7 +335,41 @@ int puzzleInCola(cola* currentC, puzzle8* pzl){
   return FALSE;
 }
 
+void addPzl(listPuzzle* current, char* pzl){
 
+  list* new = (list*)malloc(sizeof(list));
+  new->puzzle = pzl;
+  new->next = NULL;
+
+  if (current->first == NULL) {
+    current->first = new;
+    current->count = 1;
+
+    #ifdef DEBUG
+
+     printf("***La lista no tiene elementos = Cola vacia***\n");
+
+    #endif
+
+  }
+  else{
+
+    #ifdef DEBUG
+
+    // printf("***La lista tiene elementos = Cola NO vacia***\n");
+
+    #endif
+    list* aux = current->first;
+
+    while (aux->next != NULL) {
+      aux = aux->next;
+    }
+    aux->next = new;
+    current->count++;
+
+  }
+
+}
 
 void imprimir(puzzle8* pzl){
   int y = 0;
@@ -339,46 +389,173 @@ int main(int argc, char const *argv[]) {
   #ifdef DEBUG //Sentencia de DEBUG
 
   puzzle8* a = readFile("puzzle.txt");
-  cola* visitados = (cola*)malloc(sizeof(cola));
+  puzzle8* ideal = (puzzle8*)malloc(sizeof(puzzle8));
+  ideal->puzzle =(char*)malloc(sizeof(char)*SIZE_PUZZLE);
+  ideal->puzzle[0]='1';
+  ideal->puzzle[1]='2';
+  ideal->puzzle[2]='3';
+  ideal->puzzle[3]='4';
+  ideal->puzzle[4]='5';
+  ideal->puzzle[5]='6';
+  ideal->puzzle[6]='7';
+  ideal->puzzle[7]='8';
+  ideal->puzzle[8]='X';
+  ideal->next=NULL;
+  ideal->movimientos=0;
+  listPuzzle* visitados = (listPuzzle*)malloc(sizeof(listPuzzle));
+  cola* result = (cola*)malloc(sizeof(cola));
+  result->first=NULL;
+  result->count=0;
+  cola* ite = (cola*)malloc(sizeof(cola));
+  ite->first=NULL;
+  ite->count=0;
   visitados->first = NULL;
   visitados->count = 0;
-  encolar(visitados,a);
+  encolar(ite,a);
   printf("**********************\n");
+  puzzle8* aux = ite->first;
   int x = 0;
-  while (x <= 5) {
+  while (aux != NULL) {
+    printf("****ITERACION : %i\n",x);
+    addPzl(visitados,aux->puzzle);
+
+  //printf("comenzando a mover...\n" );
+  if(canXUp(aux) == TRUE){
+    //printf("se puede mover hacia arriba\n");
+    puzzle8* b = (puzzle8*)malloc(sizeof(puzzle8));
+    char* h = (char*)malloc(sizeof(char)*SIZE_PUZZLE);
+    for (int i = 0; i < SIZE_PUZZLE; i++) {
+      h[i] = aux->puzzle[i];
+    }
+    b->puzzle = h;
+    b->movimientos=0;
+    b->next = NULL;
+    //printf("imprimiendo AUX...\n");
+    //imprimir(aux);
+    moveXUp(b);
+    //printf("imprimiendo B...\n");
+    //imprimir(b);
+    if (equalsPuzzle(b->puzzle,ideal->puzzle)==TRUE) {
+         printf("******el puzzle encontrado es igual al ideal*******\n" );
+         //imprimir(b);
+         encolar(result,b);
+    }
+    if (wasVisited(visitados,b->puzzle) == FALSE) {
+      //printf("el nodo b[ARRIBA] no ha sido visitado\n" );
+       encolar(ite,b);
+    }
 
 
-  imprimir(a);
+    else{
+      //printf("el nodo b[ARRIBA] YA ha sido visitado\n" );
+      free(b->puzzle);
+      free(b);
+    }
 
-  printf("comenzando a mover...\n" );
-  if(canXUp(a) == TRUE){
-    moveXUp(a);
-    imprimir(a);
   }
-  if(canXDown(a) == TRUE){
+  if(canXDown(aux) == TRUE){
 
-    printf("se puede mover hacia abajo\n");
-
-    moveXdown(a);
-    imprimir(a);
+    //printf("se puede mover hacia abajo\n");
+    puzzle8* b = (puzzle8*)malloc(sizeof(puzzle8));
+    char* h = (char*)malloc(sizeof(char)*SIZE_PUZZLE);
+    for (int i = 0; i < SIZE_PUZZLE; i++) {
+      h[i] = aux->puzzle[i];
+    }
+    b->puzzle = h;
+    b->movimientos=0;
+    b->next = NULL;
+    //printf("imprimiendo AUX...\n");
+    //imprimir(aux);
+    moveXdown(b);
+    //printf("imprimiendo B...\n");
+    //imprimir(b);
+    if (equalsPuzzle(b->puzzle,ideal->puzzle)==TRUE) {
+         printf("******el puzzle encontrado es igual al ideal*******\n" );
+         //imprimir(b);
+         encolar(result,b);
+    }
+    if (wasVisited(visitados,b->puzzle) == FALSE) {
+      //printf("el nodo b[ABAJO] no ha sido visitado\n" );
+       encolar(ite,b);
   }
-  if(canXleft(a) == TRUE){
 
-    printf("se puede mover hacia la izquierda\n");
-    moveXleft(a);
-    imprimir(a);
+    else{
+      //printf("el nodo b[ABAJO] YA ha sido visitado\n" );
+      free(b->puzzle);
+      free(b);
+    }
   }
-  if(canXrigth(a) == TRUE){
+  if(canXleft(aux) == TRUE){
 
-    printf("se puede mover hacia la derecha\n");
-    moveXrigth(a);
-    imprimir(a);
+    //printf("se puede mover hacia la izquierda\n");
+    puzzle8* b = (puzzle8*)malloc(sizeof(puzzle8));
+    char* h = (char*)malloc(sizeof(char)*SIZE_PUZZLE);
+    for (int i = 0; i < SIZE_PUZZLE; i++) {
+      h[i] = aux->puzzle[i];
+    }
+    b->puzzle = h;
+    b->movimientos=0;
+    b->next = NULL;
+    //printf("imprimiendo AUX...\n");
+    //imprimir(aux);
+    moveXleft(b);
+    //printf("imprimiendo B...\n");
+    //imprimir(b);
+    if (equalsPuzzle(b->puzzle,ideal->puzzle)==TRUE) {
+         printf("******el puzzle encontrado es igual al ideal*******\n" );
+         //imprimir(b);
+         encolar(result,b);
+    }
+    if (wasVisited(visitados,b->puzzle) == FALSE) {
+      //printf("el nodo b[IZQUIERDA] no ha sido visitado\n" );
+
+       encolar(ite,b);
+  }
+    else{
+      //printf("el nodo b[IZQUIERDA] YA ha sido visitado\n" );
+      free(b->puzzle);
+      free(b);
+    }
+  }
+  if(canXrigth(aux) == TRUE){
+
+    //printf("se puede mover hacia la derecha\n");
+    puzzle8* b = (puzzle8*)malloc(sizeof(puzzle8));
+    char* h = (char*)malloc(sizeof(char)*SIZE_PUZZLE);
+    for (int i = 0; i < SIZE_PUZZLE; i++) {
+      h[i] = aux->puzzle[i];
+    }
+    b->puzzle = h;
+    b->movimientos=0;
+    b->next = NULL;
+    //printf("imprimiendo AUX...\n");
+    //imprimir(aux);
+    moveXrigth(b);
+    //printf("imprimiendo B...\n");
+    //imprimir(b);
+    if (equalsPuzzle(b->puzzle,ideal->puzzle)==TRUE) {
+         printf("******el puzzle encontrado es igual al ideal*******\n" );
+         //imprimir(b);
+         encolar(result,b);
+    }
+    if (wasVisited(visitados,b->puzzle) == FALSE) {
+      //printf("el nodo b[DERECHA] no ha sido visitado\n" );
+
+       encolar(ite,b);
+     }
+    else{
+      //printf("el nodo b[DERECHA] YA ha sido visitado\n" );
+      free(b->puzzle);
+      free(b);
+    }
   }
 
+  aux = aux->next;
   x++;
 
 }
-free(a);
+//printf("cantidad de iteraciones: %i\n",x);
+free(aux);
 
   #endif
   return 0;
