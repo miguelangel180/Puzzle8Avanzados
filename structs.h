@@ -10,6 +10,7 @@
 
 
 
+//estructura puzzle, guarda un puzzle como char* y los movimientos de este puzzle
 
 typedef struct nodo{
   char* pzl;
@@ -17,11 +18,13 @@ typedef struct nodo{
   struct nodo* next;
 }puzzle;
 
+//estructura que guarda siempre el primer nodo de puzzle, tambien funciona como cola
 typedef struct{
   puzzle* first;
   int count;
 }list;
 
+//estructura que almacena los movimientos cuando encuentra un resultado
 typedef struct enlace
 {
   int movs;
@@ -30,6 +33,7 @@ typedef struct enlace
 
 }result;
 
+//estructura que almacena los puzzles visitados
 typedef struct vist
 {
   char* puzle;

@@ -4,9 +4,12 @@
 #define STRUCT_H
 #include "structs.h"
 #endif
-/*
 
-#include "IOPuzzle.h"
+/* Funcion para la lectura de archivos
+
+Esta funcion guarda cada caracter del puzzle de 9 y devuelve el puntero
+a la estructura donde esta almacenada
+
 */
 puzzle* readFile(char* rute){
   char* puzzleList = (char*)malloc(sizeof(char)*SIZE_PUZZLE);
@@ -51,7 +54,10 @@ puzzle* readFile(char* rute){
 }
 
 
+/*funcion que escribe en un archivo "salida.txt" la cantidad de movimientos
+minimos necesarios para resolver el puzzle
 
+*/
 
 void writeFile(int movimientos){
 

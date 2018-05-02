@@ -5,9 +5,8 @@
 #include "structs.h"
 #endif
 #include "Puzzle.h"
-/*#include "structs.h"
-#include "visit.h"
-*/
+
+//se agrega un nuevo puzzle a la lista de visitados
 void addPzlvisit(visit* current, char* pzl){
 
 
@@ -45,6 +44,7 @@ void addPzlvisit(visit* current, char* pzl){
 
   }
 }
+// se obtiene la cantidad de puzzles visitados que tiene la lista
 
 int getCountVisit(visit* vis){
 
@@ -57,9 +57,8 @@ int getCountVisit(visit* vis){
 
 
 
-/* funcion booleana que detecta si dentro de toda la cola existe un puzzle
-igual a otro */
 
+//funcion que dice si un puzzle esta dentro de la lista de visitados
 int wasVisited(visit* currentLP, char* pzl){
 
   visit* aux = currentLP;
@@ -75,7 +74,7 @@ int wasVisited(visit* currentLP, char* pzl){
 }
 
 
-
+//se libera la lista de puzzles visitados
 void freeVisit(visit* current){
 
   while(current->next != NULL){

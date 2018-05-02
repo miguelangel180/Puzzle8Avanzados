@@ -3,11 +3,10 @@
 #ifndef STRUCT_H
 #define STRUCT_H
 #include "structs.h"
-#endif/*
+#endif
 
-#include "Puzzle.h"
-*/
 
+//obtiene la posicion actual de X
 int currentPositionX(puzzle* P){
 
   for(int i =0; i<SIZE_PUZZLE;i++){
@@ -18,8 +17,7 @@ int currentPositionX(puzzle* P){
   return -1;
 }
 
-/* Funcion booleana que detecta si una estructura puzzle contiene el mismo
-arreglo que otra estructura */
+/* Funcion booleana que dice si dos puzzles son iguales*/
 
 int equalsPuzzle(char* pzl, char* pzl2){
 
@@ -53,6 +51,7 @@ int canXUp(puzzle* puzzle){
 
 }
 
+//mueve X a la cordenada de arriba
 void moveXUp(puzzle* puzzle){
   int currentX = currentPositionX(puzzle);
   char aux = puzzle->pzl[currentX-3];
@@ -86,7 +85,7 @@ int canXDown(puzzle* puzzle){
 
 }
 
-
+//mueve X a la cordenada de abajo
 void moveXdown(puzzle* puzzle){
   int currentX = currentPositionX(puzzle);
   char aux = puzzle->pzl[currentX+3];
@@ -116,7 +115,7 @@ int canXrigth(puzzle* puzzle){
   }
 
 }
-
+//mueve X a la derecha
 void moveXrigth(puzzle* puzzle){
   int currentX = currentPositionX(puzzle);
   char aux = puzzle->pzl[currentX+1];
@@ -145,7 +144,7 @@ int canXleft(puzzle* puzzle){
   }
 
 
-
+//mueve X a la izquierda
 void moveXleft(puzzle* puzzle){
   int currentX = currentPositionX(puzzle);
   char aux = puzzle->pzl[currentX-1];

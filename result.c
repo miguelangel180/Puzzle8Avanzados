@@ -5,9 +5,11 @@
 #define STRUCT_H
 #include "structs.h"
 #endif
-/*
 
-#include "result.h"
+/*agrega un nuevo resultado a una lista de resultados
+
+Solo agrega los movimientos ya que es lo necesario para entregar el resultado.
+No se agrega el arbol de solucion.
 */
 void addPzlresult(result* current,int movimientos){
 
@@ -46,7 +48,7 @@ void addPzlresult(result* current,int movimientos){
 
 }
 
-
+//obtiene la cantidad minima de movimientos de una lista de resultados
 int getMinMoves(result* resultados){
   result* aux = resultados;
   int min = aux->movs;
@@ -60,6 +62,7 @@ int getMinMoves(result* resultados){
   return min;
 }
 
+//libera la lista de resultados
 void freeResult(result* current){
 
   while(current->next != NULL){
