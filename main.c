@@ -17,6 +17,12 @@ el cual mostrata el paso a paso de las funciones.
 
 int main(int argc, char const *argv[]) {
 
+  printf("\n\n\n");
+  printf("********************************\n");
+  printf("*      Comenzando Programa     *\n");
+  printf("********************************\n");
+  printf("NOTA: esto puede tardar 1 hora...\n");
+  printf("\n" );
   #ifdef DEBUG
   printf("¡¡¡¡ MODO DEBUG ACTIVADO !!!! \n");
   printf("*******************************\n");
