@@ -28,14 +28,16 @@ int main(int argc, char const *argv[]) {
   printf("*******************************\n");
   #endif
   //iniciando
-  puzzle* actual = readFile("puzzle.txt");
+  puzzle* actual = readFile("entrada.txt");
   list* cola_actual = (list*)malloc(sizeof(list));
   cola_actual->first = NULL;
   cola_actual->count = 0;
   visit* visitados =  (visit*)malloc(sizeof(visit));
   visitados->count=0;
+  visitados->next= NULL;
   result* resultados = (result*)malloc(sizeof(result));
   resultados->count=0;
+  resultados->next = NULL;
 
   //se encola el primer puzzle leido del archivo
   encolar(cola_actual,actual);

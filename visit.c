@@ -49,9 +49,11 @@ void addPzlvisit(visit* current, char* pzl){
 int getCountVisit(visit* vis){
 
   visit* aux = vis;
+
   while (aux->next != NULL) {
       aux = aux->next;
     }
+
     return aux->count;
 }
 
